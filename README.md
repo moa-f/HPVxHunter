@@ -33,9 +33,12 @@ HPVxHunter/
 │   ├── pave_classic_2026.fasta
 │   ├── pave_non_official_2026.fasta
 │   ├── DB_full_L1.fasta
-│   └── README.md 
+│   └── README.md
+├── scripts/
+│   └── puma/                # PuMA dependency for Deep Analysis (L1 extraction)
 ├── test_data/               # Provided sample data for testing
 │   └── test.fasta
+├── results/
 ├── main_2.py                # Main pipeline entry point
 ├── environment.yml          # Conda environment configuration
 └── README.md
