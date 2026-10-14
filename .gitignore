@@ -1,0 +1,8 @@
+
+results/
+analyze_results/
+
+results/
+analyze_results/
+data/genbank_*.fasta
+data/*.meta
