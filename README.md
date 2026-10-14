@@ -6,8 +6,8 @@ HPVxHunter is an advanced bioinformatics pipeline engineered for Human Papilloma
 ## Core Capabilities
 
 * **Adaptive Database Routing:**
-  * **PaVE (Dual-Search):** Executes parallel VSEARCH alignments against official ICTV reference types (`pave_classic`) and unofficial  (`pave_non_official`). This segregation prevents misclassification. Supports explicit database versioning (e.g., `--db pave_2026`).
-  * **GenBank (Single-Search):** Standard alignment against broader NCBI archives. The `--update_genbank` flag forces an automatic API connection to download and replace the local archive with the latest sequences.
+  * **PaVE:** Executes parallel VSEARCH alignments against official ICTV reference types (`pave_classic`) and unofficial  (`pave_non_official`). This segregation prevents misclassification. Supports explicit database versioning (e.g., `--db pave_2026`).
+  * **GenBank:** Standard alignment against broader NCBI archives. The `--update_genbank` flag forces an automatic API connection to download and replace the local archive with the latest sequences.
   * **Custom DB:** Accepts any user-provided FASTA file for alignment of unpublished sequences.
   
 * **Precision Taxonomic Classification:** 
