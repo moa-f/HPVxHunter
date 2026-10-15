@@ -55,7 +55,7 @@ cd HPVxHunter
 
 # Create and activate the conda environment
 conda env create -f environment.yml
-conda activate hpvxhunter
+conda activate HPVxHunter
 ```
 ## Usage Examples
 
