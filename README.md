@@ -15,13 +15,12 @@ HPVxHunter is an advanced bioinformatics pipeline engineered for Human Papilloma
   * Two-step back-mapping for GenBank/Custom databases (identifies the best hit, then maps it against PaVE for robust annotation).
   * Built-in sequence length-based false-positive filtering.
   
-* **Nomenclature Standardization:** 
-  * Isolated root lineages (e.g., Lineage "A") are automatically standardized to "A1" internally. This ensures absolute consistency across Excel reports and prevents fragmented sub-lineage distribution plots.
-  
-* **Decoupled Novelty Detection (Deep Analysis):**
-  * **Strict ICTV Reporting:** Sequences with < 90.0% global identity are assigned `ND` (Not Determined) in primary reports, strictly adhering to the official definition of novel HPV types.
-  * **Divergent Lineage Capture:** Sequences with < 95.0% identity silently trigger the `--deep_analysis` module. This extracts the L1 ORF using PuMA and compares it against PaVE's L1 references to detect emerging or moderately divergent lineages without corrupting the main Excel report.
-
+* **Taxonomic Classification & Variant Nomenclature:**
+  * **ICTV & PaVE Compliance:** PaVE currently hosts exclusively reference or prototype genomes. Following ICTV Papillomavirus Study Group guidelines, variant classification relies on whole-genome sequence differences (~1.0% for distinct lineages, 0.5% - 1.0% for sub-lineages). Furthermore, the prototype or reference genome is obligatorily designated as variant lineage A and sublineage A1.
+  * **Nomenclature Standardization:** To adhere to this biological standard, HPVxHunter automatically standardizes isolated root lineages (e.g., a baseline assignment of Lineage "A") to "A1". This guarantees strict consistency across primary outputs and prevents fragmented data in distribution plots.
+  * **Strict Novelty Reporting:** The ICTV defines novel HPV types by a > 10% nucleotide sequence difference in the L1 ORF. HPVxHunter strictly enforces this rule: sequences demonstrating < 90.0% global identity are assigned `ND` (Not Determined) in the main analytical reports.
+  * **Divergent Lineage Capture (Deep Analysis):** To identify emerging or moderately divergent variants before they reach the novelty threshold, users can explicitly enable the `--deep_analysis` module. When activated, sequences exhibiting < 95.0% global identity (an arbitrary operational threshold defined to capture sub-lineage variations) are routed through a decoupled pipeline. This process extracts the L1 ORF via PuMA and maps it against PaVE's L1 references, enabling variant discovery without altering the primary classification report.
+    
 ## Project Structure
 ```text
 HPVxHunter/
