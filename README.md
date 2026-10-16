@@ -44,22 +44,59 @@ HPVxHunter/
 └── README.md
 ```
 
-## Installation
+## Installation & Deployment
 
-We recommend using Conda to manage the required dependencies (Python, Pandas, Biopython, VSEARCH, etc.).
+### Option A: Docker Container (Recommended)
+Using the pre-compiled Docker image eliminates local dependency management (Conda, VSEARCH, Python). Docker Engine must be installed and running on the host system.
 
 ```bash
-# Clone the repository
+docker pull fmoa/hpvxhunter:v1
+```
+
+### Option B: Local Conda Environment
+For active development or local execution without containerization.
+
+```bash
 git clone https://github.com/moa-f/HPVxHunter.git
 cd HPVxHunter
-
-# Create and activate the conda environment
 conda env create -f environment.yml
 conda activate HPVxHunter
 ```
-## Usage Examples
 
-**1. Default Execution (PaVE 2026 Basic-Search):**
+## Usage via Docker
+
+Due to container isolation, host directories must be explicitly mounted via the `-v` flag to allow I/O operations for input sequences and output results.
+
+### 1. Environment Validation (Test Run)
+The image natively embeds the `test_data` directory. To validate the container runtime and pipeline integrity, run the following command. Only the `results` volume requires mounting for data persistence:
+
+```bash
+docker run --rm \
+  -v $(pwd)/results:/app/results \
+  fmoa/hpvxhunter:v1 \
+  --sample test_data/test.fasta \
+  --run_name "validation_run"
+```
+
+### 2. Production Execution (Real Data)
+To analyze custom FASTA sequences, mount the host directory containing your data to an internal virtual path (e.g., `/app/input_data`). The `--sample` argument must target this internal path.
+
+Example for a file named `clinical_01.fasta` located in the `./my_sequences` host directory:
+
+```bash
+docker run --rm \
+  -v $(pwd)/my_sequences:/app/input_data \
+  -v $(pwd)/results:/app/results \
+  fmoa/hpvxhunter:v1 \
+  --sample input_data/clinical_01.fasta \
+  --run_name "clinical_cohort_A"
+```
+
+## Usage via Local Conda
+
+If running directly on the host machine via the Conda environment, volume mounting is not required.
+
+**1. Default Execution:**
 ```bash
 python3 main_2.py --sample test_data/test.fasta --run_name "clinical_cohort_A"
 ```
@@ -68,11 +105,11 @@ python3 main_2.py --sample test_data/test.fasta --run_name "clinical_cohort_A"
 ```bash
 python3 main_2.py --db genbank --update_genbank --sample test_data/test.fasta
 ```
-**2. Deep Analysis Execution :**
+
+**3. Deep Analysis Execution:**
 ```bash
 python3 main_2.py --db pave_2026 --sample test_data/test.fasta --deep_analysis 1
 ```
-
 ## Command-Line Arguments
 
 | Argument | Type | Default | Description |
