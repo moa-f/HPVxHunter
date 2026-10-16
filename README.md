@@ -1,7 +1,7 @@
 # HPVxHunter 
 
 ## Overview
-HPVxHunter is an advanced bioinformatics pipeline engineered for Human Papillomavirus (HPV) sequence alignment, taxonomic classification, and novel lineage discovery. It implements an adaptive routing system to process curated reference databases and dynamic NCBI repositories, ensuring strict ICTV taxonomic compliance while capturing divergent sequences for downstream phylogenetic mapping.
+HPVxHunter is an advanced bioinformatics pipeline engineered for Human Papillomavirus (HPV) sequence alignment, taxonomic classification, and novel lineage discovery. It implements an adaptive routing system to process curated reference databases and dynamic NCBI repositories, ensuring strict ICTV taxonomic compliance while capturing divergent sequences for downstream analysis.
 
 ## Core Capabilities
 
