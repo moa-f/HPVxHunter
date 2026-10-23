@@ -35,7 +35,7 @@ EXCLUSION_PATTERN = re.compile(
 SCRIPT_DIR = Path(__file__).parent.resolve()
 
 def parse_arguments():
-    # Détermination du chemin absolu du répertoire contenant le script (Équivalent de SCRIPT_DIR)
+    # Détermination du chemin absolu du répertoire contenant le script 
 
     parser = argparse.ArgumentParser(
         description="Computational pipeline for discovering novel human papillomavirus (HPV) sub-lineages.",
@@ -50,7 +50,7 @@ def parse_arguments():
     parser.add_argument("--db", type=str, default=default_db_path,
                         help="Reference database to use for the analysis.\n"
                              " - 'pave': loads the default version (2026).\n"
-                             " - 'pave_XXXX': loads a specific version (e.g., pave_2024).\n"
+                             " - 'pave_XXXX': loads a specific version (e.g., pave_2026).\n"
                              " - 'genbank': uses the latest downloaded NCBI archive.\n"
                              " - Or specify an absolute path to a custom FASTA file.")
     
@@ -90,25 +90,23 @@ def validate_arguments(args):
         print(f"Error: Sample file '{args.sample}' does not exist.", file=sys.stderr)
         sys.exit(1)
 
-    # 2. Arbre décisionnel pour la base de données (--db)
+    # 2. Arbre décisionnel strict pour la base de données (--db)
     db_input = str(args.db).lower() 
 
-    if "pave" in db_input:
+    if re.fullmatch(r"pave(_\w+)?", db_input) and not db_input.endswith((".fasta", ".fa", ".fna")):
         # On définit les DEUX nouvelles bases
         db_classic_path = SCRIPT_DIR / "data" / "pave_classic.fasta"
         db_non_official_path = SCRIPT_DIR / "data" / "pave_non_official.fasta"
-        is_genbank = False
-        print("[INFO] Base PAVE (Mode Dual-Search activé).")
-        args.db = "pave"
+        print(f"[INFO] Base PAVE (Mode Dual-Search activé). Version : {db_input}")
+        args.db = db_input # Maintien de la version (ex: pave_2026) en variable
     else:
-        # Cas de la base de données personnalisée : vérification du fichier
-        if not Path(args.sample).is_file():
+        # Validation sécurisée de l'existence du fichier Custom (Correction du bug args.sample)
+        if db_input != "genbank" and not Path(args.db).is_file():
             print(f"Error: Database file '{args.db}' does not exist.", file=sys.stderr)
             sys.exit(1)
 
-    # 3. Assainissement du nom de session (Équivalent de tr -cd '[:alnum:]_-')
+    # 3. Assainissement du nom de session
     if args.run_name:
-        # re.sub supprime tout ce qui n'est pas alphanumérique, tiret ou underscore
         args.run_name = re.sub(r'[^a-zA-Z0-9_-]', '', args.run_name)
 
     return args
@@ -236,12 +234,12 @@ def setup_genbank_db(args):
         args.db = str(new_archive_path)
 
         return args
+    
 
 def run_post_processing(args, analyze_dir, final_dir, vsearch_classic, vsearch_non_official, out_csv):
     """
     Post-alignment routing architecture.
     Executes the appropriate VSEARCH subprocesses based on the target database.
-
     """
     genbank_matches_fasta = analyze_dir / "genbank_matches.fasta"
     besthit_genbank_match_tsv = analyze_dir / "besthit_genbank_match.tsv"   
@@ -262,13 +260,13 @@ def run_post_processing(args, analyze_dir, final_dir, vsearch_classic, vsearch_n
                 is_genbank=False
             )
 
-        # BRANCHE 2 : GENBANK OU CUSTOM DB (SINGLE-SEARCH)
+        # BRANCHE 2 : GENBANK OU CUSTOM DB
         else:
-            print("[INFO] Main Analysis Based on GenBank/Custom Database")
-            
             is_gb_flag = args.db_classic.name.startswith("genbank_")
-
-            # Étape A: Parsing initial
+            db_type = "GenBank" if is_gb_flag else "Custom"
+            print(f"[INFO] Main Analysis Based on {db_type} Database (Cross-aligned with PaVE)")
+            
+            # Étape A: Parsing initial (L'astuce is_genbank=True s'applique aux deux !)
             process_vsearch_clusters(
                 vsearch_classic_file=vsearch_classic,
                 vsearch_non_official_file=None,
@@ -276,30 +274,26 @@ def run_post_processing(args, analyze_dir, final_dir, vsearch_classic, vsearch_n
                 analyze_dir=analyze_dir, 
                 db_fasta=args.db_classic, 
                 sample_fasta=args.sample,
-                is_genbank=is_gb_flag
+                is_genbank=True 
             )
 
-            # Étape B: Extraction des séquences correspondantes
+            # Étape B: Extraction
             extract_fasta_sequences(
                 tsv_path=out_csv,
                 fasta_in_path=args.db_classic,
                 fasta_out_path=genbank_matches_fasta
             )
 
-            # Étape C: Contre-alignement VSEARCH sur la base PAVE de référence
+            # Étape C: Contre-alignement sur PaVE
             pave_reference = str(SCRIPT_DIR / "data" / "pave_classic_2026.fasta")
             vsearch_cmd_2 = [
-                "vsearch",
-                "--usearch_global", str(genbank_matches_fasta),
-                "--db", pave_reference,
-                "--id", "0",
-                "--maxaccepts", "5",
-                "--threads", "8",
-                "--blast6out", str(besthit_genbank_match_tsv)
+                "vsearch", "--usearch_global", str(genbank_matches_fasta),
+                "--db", pave_reference, "--id", "0", "--maxaccepts", "1",
+                "--threads", "8", "--blast6out", str(besthit_genbank_match_tsv)
             ]
             subprocess.run(vsearch_cmd_2, check=True)
 
-            # Étape D: Jointure relationnelle
+            # Étape D: Jointure
             excel_file = final_dir / f"{args.run_name}_results.xlsx"
             generate_final_custom_report(
                 tsv_one_path=out_csv,
@@ -377,7 +371,6 @@ def run_deep_analysis(args, analyze_dir, final_dir):
         except subprocess.CalledProcessError:
             pass
 
-
 # ==========================================
 # ZONE D'EXÉCUTION PRINCIPALE (MAIN)
 # ==========================================
@@ -428,11 +421,8 @@ if __name__ == "__main__":
     
     # --- DÉFINITION LOCALE DES CHEMINS (AVEC VERSIONING PAVE ET GENBANK) ---
     db_arg_lower = str(args_finaux.db).lower()
-    is_pave_mode = db_arg_lower.startswith("pave")
+    is_pave_mode = bool(re.fullmatch(r"pave(_\w+)?", db_arg_lower)) and not db_arg_lower.endswith((".fasta", ".fa", ".fna"))
     
-    # --- DÉFINITION LOCALE DES CHEMINS (AVEC VERSIONING PAVE ET GENBANK) ---
-    db_arg_lower = str(args_finaux.db).lower()
-    is_pave_mode = db_arg_lower.startswith("pave")
     
     if is_pave_mode:
         data_dir = SCRIPT_DIR / "data"
@@ -490,7 +480,7 @@ if __name__ == "__main__":
             
             vsearch_cmd = [
                 "vsearch", "--usearch_global", str(sanitized_sample), "--db", str(db_classic_path),
-                "--id", "0", "--maxaccepts", "5", "--threads", "8", "--blast6out", str(vsearch_classic)
+                "--id", "0", "--maxaccepts", "1", "--threads", "8", "--blast6out", str(vsearch_classic)
             ]
             subprocess.run(vsearch_cmd, check=True)
             logger.info("Alignement unique terminé avec succès.")
@@ -517,21 +507,23 @@ if __name__ == "__main__":
     # 8. Analyse approfondie (PUMA / L1)
     run_deep_analysis(args_finaux, analyze_dir, final_dir)
 
-    # ======= FINAL PLOTS =======
-    # On définit le chemin vers l'Excel généré précédemment
-    excel_results = final_dir / f"{args_finaux.run_name}_results.xlsx"
-    
-    if excel_results.exists():
-        print(f"[INFO] Generating distribution plots ({args_finaux.plot})...")
-        generate_plots(
-            excel_file=excel_results,
-            session_name=args_finaux.run_name,
-            output_dir=final_dir,
-            fmt=args_finaux.plot,   # Utilise le choix de l'utilisateur (pdf/png)
-            mode="compact"
-        )
-        print(f"[INFO] Plots saved in: {final_dir}")
+# ======= FINAL PLOTS =======
+    if args_finaux.is_pave:
+        excel_results = final_dir / f"{args_finaux.run_name}_results.xlsx"
+        if excel_results.exists():
+            print(f"[INFO] Generating distribution plots ({args_finaux.plot})...")
+            generate_plots(
+                excel_file=excel_results,
+                session_name=args_finaux.run_name,
+                output_dir=final_dir,
+                fmt=args_finaux.plot,
+                mode="compact"
+            )
+            print(f"[INFO] Plots saved in: {final_dir}")
+        else:
+            print("[WARNING] PaVE Results Excel file not found. Skipping plot generation.")
     else:
-        print("[WARNING] Results Excel file not found. Skipping plot generation.")
+        # Message propre et informatif pour les bases Custom et GenBank
+        print("[INFO] Custom/GenBank run detected. Plot generation is exclusive to PaVE (Skipping).")
 
     print("\n[SUCCÈS] Pipeline execution completed.")

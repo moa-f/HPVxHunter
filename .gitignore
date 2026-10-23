@@ -6,3 +6,6 @@ results/
 analyze_results/
 data/genbank_*.fasta
 data/*.meta
+__pycache__/
+*.pyc
+Dockerfile

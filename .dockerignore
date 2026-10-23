@@ -1,0 +1,7 @@
+# Exclure les dossiers
+results/
+data/genbank_*.fasta
+data/*.meta
+__pycache__/
+.git/
+.gitignore

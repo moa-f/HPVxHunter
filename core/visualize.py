@@ -21,10 +21,14 @@ def setup_style():
         'font.size': 12
     })
 
-def save_plot(filename, output_dir, fmt, width, height):
+def save_plot(filename, output_dir, fmt, width, height, use_tight_layout=True):
     """Encapsulation de la sauvegarde avec application de la résolution."""
     path = Path(output_dir) / f"{filename}.{fmt}"
-    plt.tight_layout()
+    
+    # Appel conditionnel pour éviter les conflits de redimensionnement sur les FacetGrids
+    if use_tight_layout:
+        plt.tight_layout()
+        
     if fmt == 'png':
         plt.savefig(path, dpi=300, bbox_inches='tight')
     else:
@@ -134,4 +138,9 @@ def generate_plots(excel_file, session_name, output_dir, fmt="png", mode="compac
             )
             g.set_axis_labels("Lineage", "Number of Sequences")
             g.fig.suptitle(f"Top {len(top_10_types)} Types - Sublineages per Lineage", y=1.02)
-            save_plot(f"{session_name}_sublineages_top10_types", output_dir, fmt, 14, 10)
+            
+            sns.move_legend(g, "center right", bbox_to_anchor=(1.15, 0.5))
+            
+            g.fig.subplots_adjust(right=0.85)
+
+            save_plot(f"{session_name}_sublineages_top10_types", output_dir, fmt, 14, 10, use_tight_layout=False)

@@ -85,7 +85,7 @@ def process_vsearch_clusters(vsearch_classic_file, vsearch_non_official_file, ou
             df['unofficial_match'] = "NA"
 
     except pd.errors.EmptyDataError:
-        print("[WARNING] Le fichier VSEARCH classique est vide.")
+        print("[WARNING] The classic VSEARCH file is empty.")
         cols = ["Sequence", "Match", "Type", "Lineage", "Sub-lineage", "Similarity", "Length Difference", "Results"] if is_genbank else ["Sequence", "Type", "Lineage", "Sub-lineage", "Similarity", "Length Difference", "Results", "Meilleur match non-officiel"]
         pd.DataFrame(columns=cols).to_csv(out_csv, sep='\t', index=False)
         return
@@ -278,7 +278,6 @@ def generate_final_custom_report(tsv_one_path, tsv_two_path, excel_out, format_m
         else:
             ls, sls, res = 'ND', 'ND', f"No significant match ({perc}), try --deep_analysis, closest type: {type_ref}"
 
-        # Note technique: le script Perl écrase la différence de longueur par 100 - identité
         diff = round(100.0 - perc, 2)
 
         if format_mode == "compact":
