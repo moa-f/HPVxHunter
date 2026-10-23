@@ -9,3 +9,4 @@ data/*.meta
 __pycache__/
 *.pyc
 Dockerfile
+.dockerignore
