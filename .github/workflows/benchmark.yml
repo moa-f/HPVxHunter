@@ -37,6 +37,7 @@ jobs:
       - name: Execute and Measure Peak Resources
         run: |
           /usr/bin/time -v docker run --rm \
+            -v ${{ github.workspace }}/test_data:/app/test_data \
             -v ${{ github.workspace }}/results:/app/results \
             fmoa/hpvxhunter:latest \
             --db pave \
