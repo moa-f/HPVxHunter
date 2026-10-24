@@ -1,0 +1,44 @@
+name: Resource Consumption Benchmark
+
+on: 
+  workflow_dispatch:
+    inputs:
+      multiplier:
+        description: 'Nombre de duplications'
+        required: true
+        default: '100'
+      input_file:
+        description: 'Chemin du fichier source dans le dépôt'
+        required: true
+        default: 'test_data/test.fasta'
+
+jobs:
+  benchmark-resources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate Massive Valid Dataset
+        run: |
+          mkdir -p test_data results
+          > test_data/massive.fasta
+          echo "Génération de ${{ github.event.inputs.multiplier }} itérations depuis ${{ github.event.inputs.input_file }}..."
+          for i in $(seq 1 ${{ github.event.inputs.multiplier }}); do
+            cat ${{ github.event.inputs.input_file }} >> test_data/massive.fasta
+          done
+
+      - name: Pull Docker Image
+        run: docker pull fmoa/hpvxhunter:v1
+
+      - name: Install System Time Utility
+        run: sudo apt-get update && sudo apt-get install -y time
+
+      - name: Execute and Measure Peak Resources
+        run: |
+          /usr/bin/time -v docker run --rm \
+            -v ${{ github.workspace }}/test_data:/app/test_data \
+            -v ${{ github.workspace }}/results:/app/results \
+            fmoa/hpvxhunter:v1 \
+            --sample test_data/massive.fasta \
+            --run_name "github_benchmark"
