@@ -42,4 +42,5 @@ jobs:
             fmoa/hpvxhunter:latest \
             --db pave \
             --sample test_data/massive.fasta \
-            --run_name "github_benchmark"
+            --run_name "github_benchmark" \
+            --deep_analysis 1
