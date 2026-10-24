@@ -29,7 +29,7 @@ jobs:
           done
 
       - name: Pull Docker Image
-        run: docker pull fmoa/hpvxhunter:v1
+        run: docker pull fmoa/hpvxhunter:latest
 
       - name: Install System Time Utility
         run: sudo apt-get update && sudo apt-get install -y time
@@ -37,8 +37,8 @@ jobs:
       - name: Execute and Measure Peak Resources
         run: |
           /usr/bin/time -v docker run --rm \
-            -v ${{ github.workspace }}/test_data:/app/test_data \
             -v ${{ github.workspace }}/results:/app/results \
-            fmoa/hpvxhunter:v1 \
+            fmoa/hpvxhunter:latest \
+            --db pave \
             --sample test_data/massive.fasta \
             --run_name "github_benchmark"
