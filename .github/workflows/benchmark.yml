@@ -36,11 +36,9 @@ jobs:
 
       - name: Execute and Measure Peak Resources
         run: |
-          /usr/bin/time -v docker run --rm \
+          docker run --rm \
             -v ${{ github.workspace }}/test_data:/app/test_data \
             -v ${{ github.workspace }}/results:/app/results \
+            --entrypoint /bin/bash \
             fmoa/hpvxhunter:latest \
-            --db pave \
-            --sample test_data/massive.fasta \
-            --run_name "github_benchmark" \
-            --deep_analysis 1
+            -c "apt-get update && apt-get install -y time && /usr/bin/time -v python main.py --db pave --sample test_data/massive.fasta --run_name github_benchmark_deep --deep_analysis 1"
