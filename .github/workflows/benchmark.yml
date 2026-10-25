@@ -41,4 +41,4 @@ jobs:
             -v ${{ github.workspace }}/results:/app/results \
             --entrypoint /bin/bash \
             fmoa/hpvxhunter:latest \
-            -c "apt-get update && apt-get install -y time && /usr/bin/time -v python main.py --db pave --sample test_data/massive.fasta --run_name github_benchmark_deep --deep_analysis 1"
+            -c "apt-get update && apt-get install -y time && /usr/bin/time -v python main.py --db genebank --sample test_data/massive.fasta --run_name github_benchmark_deep --deep_analysis 1"
