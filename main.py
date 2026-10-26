@@ -43,11 +43,10 @@ def parse_arguments():
     )
 
     # Construction des chemins par défaut absolus
-    default_db_path = SCRIPT_DIR / "data" / "full_database_Pave.fasta"
     default_sample_path = SCRIPT_DIR / "test_data" / "test.fasta"
 
     # Paramètre : --db
-    parser.add_argument("--db", type=str, default=default_db_path,
+    parser.add_argument("--db", type=str, default="pave",
                         help="Reference database to use for the analysis.\n"
                              " - 'pave': loads the default version (2026).\n"
                              " - 'pave_XXXX': loads a specific version (e.g., pave_2026).\n"
@@ -97,7 +96,7 @@ def validate_arguments(args):
         # On définit les DEUX nouvelles bases
         db_classic_path = SCRIPT_DIR / "data" / "pave_classic.fasta"
         db_non_official_path = SCRIPT_DIR / "data" / "pave_non_official.fasta"
-        print(f"[INFO] Base PAVE (Mode Dual-Search activé). Version : {db_input}")
+        print(f"[INFO] Base PAVE. Version : {db_input}")
         args.db = db_input # Maintien de la version (ex: pave_2026) en variable
     else:
         # Validation sécurisée de l'existence du fichier Custom (Correction du bug args.sample)

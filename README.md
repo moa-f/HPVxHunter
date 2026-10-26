@@ -15,12 +15,10 @@ HPVxHunter is an advanced bioinformatics pipeline engineered for Human Papilloma
   * Two-step back-mapping for GenBank/Custom databases (identifies the best hit, then maps it against PaVE for robust annotation).
   * Built-in sequence length-based false-positive filtering.
   
-* **Taxonomic Classification & Variant Nomenclature:**
-  * **ICTV & PaVE Compliance:** PaVE currently hosts exclusively reference or prototype genomes. Following ICTV Papillomavirus Study Group guidelines, variant classification relies on whole-genome sequence differences (~1.0% for distinct lineages, 0.5% - 1.0% for sub-lineages). Furthermore, the prototype or reference genome is obligatorily designated as variant lineage A and sublineage A1.
-  * **Nomenclature Standardization:** To adhere to this biological standard, HPVxHunter automatically standardizes isolated root lineages (e.g., a baseline assignment of Lineage "A") to "A1". This guarantees strict consistency across primary outputs and prevents fragmented data in distribution plots.
-  * **Strict Novelty Reporting:** The ICTV defines novel HPV types by a > 10% nucleotide sequence difference in the L1 ORF. HPVxHunter strictly enforces this rule: sequences demonstrating < 90.0% global identity are assigned `ND` (Not Determined) in the main analytical reports.
-  * **Divergent Lineage Capture (Deep Analysis):** To identify emerging or moderately divergent variants before they reach the novelty threshold, users can explicitly enable the `--deep_analysis` module. When activated, sequences exhibiting < 95.0% global identity (an arbitrary operational threshold defined to capture sub-lineage variations) are routed through a decoupled pipeline. This process extracts the L1 ORF via PuMA and maps it against PaVE's L1 references, enabling variant discovery without altering the primary classification report.
-    
+* **Nomenclature Standardization:** Isolated root lineages (e.g., Lineage "A") are automatically standardized to "A1". This ensures absolute consistency across Excel reports and prevents fragmented sub-lineage distribution plots.
+* **Decoupled Novelty Detection (Deep Analysis):**
+  * **Strict ICTV Reporting:** Sequences with < 90.0% global identity are assigned `ND` (Not Determined) in primary reports, strictly adhering to the official definition of novel HPV types.
+  * **Divergent Lineage Capture:** Sequences with < 95.0% identity — an arbitrary threshold designed to proactively flag potential divergence within the PaVE nomenclature framework — are marked for further investigation. When the `--deep_analysis 1` is enabled, the pipeline extracts the L1 ORF using PuMA and compares it against PaVE's L1 references to detect emerging lineages without altering the main Excel report.    
 ## Project Structure
 ```text
 HPVxHunter/
@@ -49,7 +47,7 @@ HPVxHunter/
 Using the pre-compiled Docker image eliminates local dependency management (Conda, VSEARCH, Python). Docker Engine must be installed and running on the host system.
 
 ```bash
-docker pull fmoa/hpvxhunter:v1
+docker pull fmoa/hpvxhunter:latest
 ```
 
 ### Option B: Local Conda Environment
@@ -72,23 +70,30 @@ The image natively embeds the `test_data` directory. To validate the container r
 ```bash
 docker run --rm \
   -v $(pwd)/results:/app/results \
-  fmoa/hpvxhunter:v1 \
+  fmoa/hpvxhunter:latest \
+  --db pave \
   --sample test_data/test.fasta \
   --run_name "validation_run"
 ```
 
-### 2. Production Execution (Real Data)
-To analyze custom FASTA sequences, mount the host directory containing your data to an internal virtual path (e.g., `/app/input_data`). The `--sample` argument must target this internal path.
 
-Example for a file named `clinical_01.fasta` located in the `./my_sequences` host directory:
+### 2. Production Execution (Real Data)
+Docker operates in an isolated file system. To allow the software to read your sequences, you must explicitly link a local directory to the container.
+
+**Step 1:** Create a new directory named `data` in your current working location and place your FASTA file inside it (e.g., `clinical_01.fasta`).
+
+**Step 2:** Run the pipeline using the following command. Modify `clinical_01.fasta` to match your actual file name, and adjust `clinical_cohort_A` for your desired output folder name.
+
 
 ```bash
 docker run --rm \
-  -v $(pwd)/my_sequences:/app/input_data \
+  -v $(pwd)/data:/app/data \
   -v $(pwd)/results:/app/results \
-  fmoa/hpvxhunter:v1 \
-  --sample input_data/clinical_01.fasta \
-  --run_name "clinical_cohort_A"
+  fmoa/hpvxhunter:latest \
+  --db genbank \
+  --sample data/clinical_01.fasta \
+  --run_name "clinical_cohort_A" \
+  --deep_analysis
 ```
 
 ## Usage via Local Conda
@@ -97,17 +102,17 @@ If running directly on the host machine via the Conda environment, volume mounti
 
 **1. Default Execution:**
 ```bash
-python3 main_2.py --sample test_data/test.fasta --run_name "clinical_cohort_A"
+python3 main.py --sample test_data/test.fasta --run_name "clinical_cohort_A"
 ```
 
 **2. GenBank Execution with API Update:**
 ```bash
-python3 main_2.py --db genbank --update_genbank --sample test_data/test.fasta
+python3 main.py --db genbank --update_genbank --sample test_data/test.fasta
 ```
 
 **3. Deep Analysis Execution:**
 ```bash
-python3 main_2.py --db pave_2026 --sample test_data/test.fasta --deep_analysis 1
+python3 main.py --db pave_2026 --sample test_data/test.fasta --deep_analysis 1
 ```
 ## Command-Line Arguments
 
