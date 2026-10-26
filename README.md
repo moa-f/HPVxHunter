@@ -36,7 +36,7 @@ HPVxHunter/
 ├── test_data/               # Provided sample data for testing
 │   └── test.fasta
 ├── results/
-├── main_2.py                # Main pipeline entry point
+├── main.py                # Main pipeline entry point
 ├── environment.yml          # Conda environment configuration
 └── README.md
 ```
