@@ -18,7 +18,7 @@ HPVxHunter is an advanced bioinformatics pipeline engineered for Human Papilloma
 * **Nomenclature Standardization:** Isolated root lineages (e.g., Lineage "A") are automatically standardized to "A1". This ensures absolute consistency across Excel reports and prevents fragmented sub-lineage distribution plots.
 * **Decoupled Novelty Detection (Deep Analysis):**
   * **Strict ICTV Reporting:** Sequences with < 90.0% global identity are assigned `ND` (Not Determined) in primary reports, strictly adhering to the official definition of novel HPV types.
-  * **Divergent Lineage Capture:** Sequences with < 95.0% identity — an arbitrary threshold designed to proactively flag potential divergence within the PaVE nomenclature framework — are marked for further investigation. When the `--deep_analysis 1` is enabled, the pipeline extracts the L1 ORF using PuMA and compares it against PaVE's L1 references to detect emerging lineages without altering the main Excel report.    
+  * **Divergent Lineage Capture:** Sequences with < 95.0% identity an arbitrary threshold designed to proactively flag potential divergence within the PaVE nomenclature framework  are marked for further investigation. When the `--deep_analysis 1` is enabled, the pipeline extracts the L1 ORF using PuMA and compares it against PaVE's L1 references to detect emerging lineages without altering the main Excel report.    
 ## Project Structure
 ```text
 HPVxHunter/
