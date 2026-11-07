@@ -30,6 +30,18 @@ When running `HPVxHunter`, the output Excel report includes two critical columns
 * **`Length Difference`** *(All modes)*: Measures the absolute base-pair length difference (in bp) between the query sequence and its best database reference hit. This serves as an essential Quality Control (QC) filter: large length deviations (e.g., >20–30 bp) indicate potential sequencing indels, homopolymeric errors, or incomplete genome assemblies that can artificially depress global similarity scores, preventing false-positive novel lineage or variant calls.
 * **`PAVE match`** *(GenBank and Custom Database modes only)*: When aligning against GenBank or custom FASTA files, the raw headers typically do not contain formal type, lineage and sub-lineage annotations. To resolve this, `HPVxHunter` performs a two-step back-mapping: it identifies the best database hit, and then projects that reference sequence against the official PaVE database. The `PAVE match` column displays this resulting official PaVE classification (Type-Lineage-Sublineage).
   * *How to read it:* While the `Similarity` and `Results` columns evaluate your query against its direct GenBank/custom hit, the `PAVE match` column reveals what that hit officially represents in the PaVE nomenclature framework (e.g., if your query matches an unannotated GenBank entry that `PAVE match` resolves as `HPV72-A-ND`, it confirms a real, circulating sub-lineage not yet formalized in PaVE).
+
+### Example Output & Case Scenarios (GenBank / Custom DB Mode)
+
+| Sequence | Match | Type | Lineage | Sub-lineage | Similarity | Length Difference | Results | PAVE match |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `Sample_345` | `MF288727.1` | Same type | Same lineage | Same sublineage | 99.9% | 0 | Perfect or near-perfect match | `HPV18-A-A5` |
+| `Sample_512` | `OP712107.1` | Same type | Same lineage | Same sublineage | 99.8% | 2 | Perfect or near-perfect match | `HPV72-A-ND` |
+| `Sample_809` | `KC470285.1` | Same type | Same lineage | Different sublineage | 99.2% | 48 | Probably new sublineage | `HPV35-A-A1` |
+
+* **Case 1 (`Sample_345` — Known sub-lineage):** The query matches GenBank entry `MF288727.1` with 99.9% identity and no length discrepancy (`0 bp`). Because the back-mapping confirms that `MF288727.1` corresponds to `HPV18-A-A5` in PaVE, `Sample_345` belongs to the `HPV18-A-A5` sub-lineage.
+* **Case 2 (`Sample_512` — Unratified circulating sub-lineage):** The query is nearly identical (`99.8%`, `2 bp` difference) to GenBank isolate `OP712107.1`, meaning both sequences belong to the exact same sub-lineage. However, `PAVE match` returns `HPV72-A-ND`, indicating that `OP712107.1` is not yet assigned to an official sub-lineage in PaVE. This tells the user that their sample belongs to a real, circulating HPV72 Lineage A variant already present in NCBI, even though it awaits formal PaVE sub-lineage ratification.
+* **Case 3 (`Sample_809` — Sequencing / assembly artifact flagged by QC):** Based strictly on its `99.2%` similarity to `KC470285.1` (`HPV35-A-A1`), the raw threshold flags `Sample_809` as a `"Probably new sublineage"`. However, the `Length Difference` column reveals a `48 bp` deviation, alerting the user that the depressed similarity score is likely driven by a technical deletion or incomplete amplicon rather than true evolutionary divergence.
 ## Project Structure
 ```text
 HPVxHunter/
