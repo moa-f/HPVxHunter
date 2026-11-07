@@ -19,7 +19,7 @@ HPVxHunter is an advanced bioinformatics pipeline engineered for Human Papilloma
 
 - **Decoupled Novelty Detection (Deep Analysis):**
   * **Primary Screening & Thresholds:** Sequences exhibiting < 90.0% global whole-genome identity are assigned `ND` (Not Determined) in primary reports to prevent erroneous formal assignments, while still reporting the closest available database hit. Sequences with < 95.0% global identity are proactively flagged as divergent candidates.
-  * **L1 ORF Verification:** When `--deep_analysis 1` is enabled, flagged sequences are routed to an integrated PuMA module that extracts the L1 open reading frame (ORF) and compares it against official PaVE L1 references. In strict compliance with ICTV criteria, candidate sequences displaying < 90.0% L1 nucleotide identity (> 10.0% divergence) are confirmed as novel HPV types in a dedicated secondary report without altering primary clinical outputs.
+  * **L1 ORF Verification:** When `--deep_analysis 1` is enabled, flagged sequences are routed to an integrated PuMA module that extracts the L1 open reading frame (ORF) and compares it against official PaVE L1 references. In strict compliance with ICTV criteria, candidate sequences displaying < 90.0% L1 nucleotide identity (> 10.0% divergence) are confirmed as novel HPV types in a dedicated secondary report without altering primary analysis reports.
 
 ---
 
