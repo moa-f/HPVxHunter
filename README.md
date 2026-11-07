@@ -5,20 +5,31 @@ HPVxHunter is an advanced bioinformatics pipeline engineered for Human Papilloma
 
 ## Core Capabilities
 
-* **Adaptive Database Routing:**
-  * **PaVE:** Executes parallel VSEARCH alignments against official ICTV reference types (`pave_classic`) and unofficial  (`pave_non_official`). This segregation prevents misclassification, while keeping unofficial sequences available for valuable additional insights. Supports explicit database versioning (e.g., `--db pave_2026`).
+- **Adaptive Database Routing:**
+  * **PaVE:** Executes parallel VSEARCH alignments against official ICTV reference types (`pave_classic`) and unofficial (`pave_non_official`). This segregation prevents misclassification, while keeping unofficial sequences available for valuable additional insights. Supports explicit database versioning (e.g., `--db pave_2026`).
   * **GenBank:** Standard alignment against broader NCBI archives. The `--update_genbank` flag forces an automatic API connection to download and replace the local archive with the latest sequences.
-  * **Custom DB:** Accepts any user-provided FASTA file for alignment of unpublished sequences.
+  * **Custom DB:** Accepts any user-provided FASTA file for alignment of unpublished sequences (allowing research teams to build local reference libraries while awaiting formal PaVE integration).
   
-* **Precision Taxonomic Classification:** 
+- **Precision Taxonomic Classification:** 
   * Direct lineage, sublineage, and high-risk flagging when using PaVE.
   * Two-step back-mapping for GenBank/Custom databases (identifies the best hit, then maps it against PaVE for robust annotation).
   * Built-in sequence length-based false-positive filtering.
   
-* **Nomenclature Standardization:** Isolated root lineages (e.g., Lineage "A") are automatically standardized to "A1". This ensures absolute consistency across Excel reports and prevents fragmented sub-lineage distribution plots.
-* **Decoupled Novelty Detection (Deep Analysis):**
-  * **Strict ICTV Reporting:** Sequences with < 90.0% global identity are assigned `ND` (Not Determined) in primary reports, strictly adhering to the official definition of novel HPV types.
-  * **Divergent Lineage Capture:** Sequences with < 95.0% identity (an arbitrary threshold designed to proactively flag potential divergence within the PaVE nomenclature framework)  are marked for further investigation. When the `--deep_analysis 1` is enabled, the pipeline extracts the L1 ORF using PuMA and compares it against PaVE's L1 references to detect emerging lineages without altering the main Excel report.    
+- **Nomenclature Standardization:** Isolated root lineages (e.g., Lineage "A") are automatically standardized to `A1`. This ensures absolute consistency across Excel reports and prevents fragmented sub-lineage distribution plots.
+
+- **Decoupled Novelty Detection (Deep Analysis):**
+  * **Primary Screening & Thresholds:** Sequences exhibiting < 90.0% global whole-genome identity are assigned `ND` (Not Determined) in primary reports to prevent erroneous formal assignments, while still reporting the closest available database hit. Sequences with < 95.0% global identity are proactively flagged as divergent candidates.
+  * **L1 ORF Verification:** When `--deep_analysis 1` is enabled, flagged sequences are routed to an integrated PuMA module that extracts the L1 open reading frame (ORF) and compares it against official PaVE L1 references. In strict compliance with ICTV criteria, candidate sequences displaying < 90.0% L1 nucleotide identity (> 10.0% divergence) are confirmed as novel HPV types in a dedicated secondary report without altering primary clinical outputs.
+
+---
+
+## Output Interpretation & Key Columns
+
+When running `HPVxHunter`, the output Excel report includes two critical columns designed to ensure robust quality control and taxonomic traceability across all database modes:
+
+* **`Length Difference`** *(All modes)*: Measures the absolute base-pair length difference (in bp) between the query sequence and its best database reference hit. This serves as an essential Quality Control (QC) filter: large length deviations (e.g., >20–30 bp) indicate potential sequencing indels, homopolymeric errors, or partial gene amplifications from failed PCR pools that can artificially depress global similarity scores, preventing false-positive novel lineage or variant calls.
+* **`PAVE match`** *(GenBank and Custom Database modes only)*: When aligning against GenBank or custom FASTA files, the raw headers often lack standardized lineage metadata. To resolve this, `HPVxHunter` performs a two-step back-mapping: it identifies the best database hit, and then projects that reference sequence against the official PaVE database. The `PAVE match` column displays this resulting official PaVE classification (Type-Lineage-Sublineage).
+  * *How to read it:* While the `Similarity` and `Results` columns evaluate your query against its direct GenBank/custom hit, the `PAVE match` column reveals what that hit officially represents in the PaVE nomenclature framework (e.g., if your query matches an unannotated GenBank entry that `PAVE match` resolves as `HPV72-A-ND`, it confirms a real, circulating sub-lineage not yet formalized in PaVE).
 ## Project Structure
 ```text
 HPVxHunter/
