@@ -33,7 +33,7 @@ When running `HPVxHunter`, the output Excel report includes two critical columns
 
 ### Example Output & Case Scenarios (GenBank / Custom DB Mode)
 
-| Sequence | Match | Type | Lineage | Sub-lineage | Similarity | Length Difference | Results | PAVE match |
+| Sequence | Match | Type | Lineage | Sub-lineage | Similarity | Length Difference | Results | Hit PAVE match |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `Sample_345` | `MF288727.1` | Same type | Same lineage | Same sublineage | 99.9% | 0 | Perfect or near-perfect match | `HPV18-A-A5` |
 | `Sample_512` | `OP712107.1` | Same type | Same lineage | Same sublineage | 99.8% | 2 | Perfect or near-perfect match | `HPV72-A-ND` |
