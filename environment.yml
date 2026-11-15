@@ -1,7 +1,8 @@
 name: HPVxHunter
 channels:
-  - https://repo.anaconda.com/pkgs/main
-  - https://repo.anaconda.com/pkgs/r
+  - conda-forge
+  - bioconda
+  - defaults
 dependencies:
   - muscle=5.3
   - meme=5.5.8
