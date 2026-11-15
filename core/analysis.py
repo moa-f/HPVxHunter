@@ -135,7 +135,7 @@ def process_vsearch_clusters(vsearch_classic_file, vsearch_non_official_file, ou
                     sub = match_pave.group(3)
                     sub_lineage = f"{lineage}-{sub}" if sub else f"{lineage}-1"
                 else:
-                    lineage, sub_lineage = 'A', 'A-1'
+                    lineage, sub_lineage = 'A', 'ref'
 
             type_ref = type_val
 
@@ -262,7 +262,7 @@ def generate_final_custom_report(tsv_one_path, tsv_two_path, excel_out, format_m
                 sub_lineage = f"{lineage}{sub}" if sub else f"{lineage}1"
             else:
                 # Fallback strict
-                lineage, sub_lineage = 'A', 'A1'
+                lineage, sub_lineage = 'A', 'ref'
 
         type_ref = type_val
 
@@ -282,7 +282,7 @@ def generate_final_custom_report(tsv_one_path, tsv_two_path, excel_out, format_m
 
         if format_mode == "compact":
             pave_match = f"{type_val}-{ls}-{sls}"
-            pave_data.append({'Match_ID': seq_id, 'PAVE match': pave_match})
+            pave_data.append({'Match_ID': seq_id, 'Hit PAVE match': pave_match})
         else:
             pave_data.append({
                 'Match_ID': seq_id,
