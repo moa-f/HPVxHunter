@@ -16,4 +16,4 @@ dependencies:
   - openpyxl
   - entrez-direct=24.0
   - ncbi-vdb=3.2.1
-prefix: /home/moa/miniconda3/envs/HPVxHunter
+
