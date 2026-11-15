@@ -262,7 +262,7 @@ def generate_final_custom_report(tsv_one_path, tsv_two_path, excel_out, format_m
                 sub_lineage = f"{lineage}{sub}" if sub else f"{lineage}1"
             else:
                 # Fallback strict
-                lineage, sub_lineage = 'A', 'REF'
+                lineage, sub_lineage = 'REF', 'REF'
 
         type_ref = type_val
 
@@ -281,7 +281,10 @@ def generate_final_custom_report(tsv_one_path, tsv_two_path, excel_out, format_m
         diff = round(100.0 - perc, 2)
 
         if format_mode == "compact":
-            pave_match = f"{type_val}-{ls}-{sls}"
+            if ls == 'REF' and sls == 'REF':
+                pave_match = f"{type_val}REF"
+            else:
+                pave_match = f"{type_val}-{ls}-{sls}"
             pave_data.append({'Match_ID': seq_id, 'Hit PAVE match': pave_match})
         else:
             pave_data.append({
@@ -305,7 +308,7 @@ def generate_final_custom_report(tsv_one_path, tsv_two_path, excel_out, format_m
     if df_pave.empty:
         df_final = df1.copy()
         if format_mode == "compact":
-            df_final['PAVE match'] = "NA"
+            df_final['Hit PAVE match'] = "NA"
         else:
             cols_to_add = ['Sequence blasted in PAVE', 'Type', 'Lineage', 'Sub-lineage', 'Percentage', 'Length Difference', 'PAVE result']
             for col in cols_to_add:
