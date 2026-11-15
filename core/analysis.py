@@ -13,7 +13,7 @@ class DataValidationError(Exception):
     pass
 
 # REGEX format PAVE (HPV16-A1_K02718) HPV[Type]-[Lignée][Sous-lignée]_[Accession]
-REGEX_PAVE = re.compile(r'HPV-?([a-zA-Z0-9]+)(?:-([A-Z])(\d*))?', re.IGNORECASE)
+REGEX_PAVE = re.compile(r'HPV-?([a-zA-Z0-9]+)(?:-(?!REF)([A-Z])(\d*))?', re.IGNORECASE)
 
 HR_TYPES = {"HPV16", "HPV18", "HPV31", "HPV33", "HPV35", "HPV39", "HPV45", 
             "HPV51", "HPV52", "HPV56", "HPV58", "HPV59", "HPV66", "HPV68"}
@@ -135,7 +135,7 @@ def process_vsearch_clusters(vsearch_classic_file, vsearch_non_official_file, ou
                     sub = match_pave.group(3)
                     sub_lineage = f"{lineage}-{sub}" if sub else f"{lineage}-1"
                 else:
-                    lineage, sub_lineage = 'A', 'ref'
+                    lineage, sub_lineage = 'A', 'REF'
 
             type_ref = type_val
 
@@ -262,7 +262,7 @@ def generate_final_custom_report(tsv_one_path, tsv_two_path, excel_out, format_m
                 sub_lineage = f"{lineage}{sub}" if sub else f"{lineage}1"
             else:
                 # Fallback strict
-                lineage, sub_lineage = 'A', 'ref'
+                lineage, sub_lineage = 'A', 'REF'
 
         type_ref = type_val
 
