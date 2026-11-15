@@ -15,7 +15,7 @@ HPVxHunter is an advanced bioinformatics pipeline engineered for Human Papilloma
   * Two-step back-mapping for GenBank/Custom databases (identifies the best hit, then maps it against PaVE for robust annotation).
   * Built-in sequence length-based false-positive filtering.
   
-- **Nomenclature Standardization:** Isolated root lineages (e.g., Lineage "A") are automatically standardized to `A1`. This ensures absolute consistency across Excel reports and prevents fragmented sub-lineage distribution plots and provides an immediate baseline for calling emerging sub-lineages (e.g., an isolate diverging by 0.5-1.0% directly qualifies as candidate `A2`).
+- **Nomenclature Standardization:** HPVxHunter preserves official PaVE taxonomic designations. When a genotype has established lineages but a non-subdivided root clade in the reference header (e.g., `HPV16-A`), it is standardized to `A1` (`A-1`) to ensure consistent downstream plotting. However, for genotypes represented by a single reference genome without established lineages or sub-lineages (e.g., `HPV25REF`), the pipeline retains the `REF` designation (`Lineage: REF`, `Sub-lineage: REF`, or `Hit PAVE match: HPV25REF` in GenBank/Custom mode) rather than forcing an `A1` label, avoiding the misleading implication that other lineages or sub-lineages have been identified for that type.
 
 - **Decoupled Novelty Detection (Deep Analysis):**
   * **Primary Screening & Thresholds:** Sequences exhibiting < 90.0% global whole-genome identity are assigned `ND` (Not Determined) in primary reports to prevent erroneous formal assignments, while still reporting the closest available database hit. Sequences with < 95.0% global identity are proactively flagged as divergent candidates.
