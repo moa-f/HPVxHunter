@@ -116,7 +116,7 @@ docker run --rm \
   --db genbank \
   --sample data/clinical_01.fasta \
   --run_name "clinical_cohort_A" \
-  --deep_analysis
+  --deep_analysis 1
 ```
 
 ## Usage via Local Conda
