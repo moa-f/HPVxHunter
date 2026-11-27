@@ -103,18 +103,18 @@ docker run --rm \
 ### 2. Production Execution (Real Data)
 Docker operates in an isolated file system. To allow the software to read your sequences, you must explicitly link a local directory to the container.
 
-**Step 1:** Create a new directory named `data` in your current working location and place your FASTA file inside it (e.g., `clinical_01.fasta`).
+**Step 1:** Create a new directory named `input` in your current working location and place your FASTA file inside it (e.g., `clinical_01.fasta`).
 
 **Step 2:** Run the pipeline using the following command. Modify `clinical_01.fasta` to match your actual file name, and adjust `clinical_cohort_A` for your desired output folder name.
 
 
 ```bash
 docker run --rm \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/results:/app/results \
+  -v "$(pwd)/input":/app/input \
+  -v "$(pwd)/results":/app/results \
   fmoa/hpvxhunter:latest \
   --db genbank \
-  --sample data/clinical_01.fasta \
+  --sample /app/input/clinical_01.fasta \
   --run_name "clinical_cohort_A" \
   --deep_analysis 1
 ```
